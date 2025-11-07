@@ -1,5 +1,4 @@
-.venv
-.env
-calender_app/.env
-t/venv
-t/pccoe1/venv
+# Gitignore for sensitive files
+t/pccoe1/token.json
+t/pccoe1/credentials1.json
+t/pccoe1/credentials.json
