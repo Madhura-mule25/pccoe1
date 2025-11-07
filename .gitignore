@@ -1,0 +1,5 @@
+.venv
+.env
+calender_app/.env
+t/venv
+t/pccoe1/venv
