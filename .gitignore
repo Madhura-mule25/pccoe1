@@ -1,4 +1,2 @@
-# Gitignore for sensitive files
-t/pccoe1/token.json
-t/pccoe1/credentials1.json
-t/pccoe1/credentials.json
+
+calender_app/.env
