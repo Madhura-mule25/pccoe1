@@ -16,7 +16,7 @@ model = genai.GenerativeModel('gemini-2.5-flash')
 # --- Translations ---
 translations = {
     "en": {
-        "title": "Gemini Calendar Assistant for Farmers",
+        "title": "Calendar Assistant for Farmers",
         "get_plan_header": "Get a Farming Plan",
         "get_plan_write": "Ask for a farming plan, and Gemini will help you.",
         "get_plan_example": "For example: 'What is a good plan for planting tomatoes in a 1-acre field?'",
@@ -34,7 +34,7 @@ translations = {
         "language_select": "Language"
     },
     "hi": {
-        "title": "किसानों के लिए जेमिनी कैलेंडर सहायक",
+        "title": "किसानों के लिए कैलेंडर सहायक",
         "get_plan_header": "खेती की योजना प्राप्त करें",
         "get_plan_write": "खेती की योजना के लिए पूछें, और जेमिनी आपकी मदद करेगा।",
         "get_plan_example": "उदाहरण के लिए: '1 एकड़ खेत में टमाटर लगाने की अच्छी योजना क्या है?'",
@@ -52,7 +52,7 @@ translations = {
         "language_select": "भाषा"
     },
     "mr": {
-        "title": "शेतकऱ्यांसाठी जेमिनी दिनदर्शिका सहाय्यक",
+        "title": "शेतकऱ्यांसाठी दिनदर्शिका सहाय्यक",
         "get_plan_header": "शेतीची योजना मिळवा",
         "get_plan_write": "शेती योजनेसाठी विचारा, आणि जेमिनी तुम्हाला मदत करेल.",
         "get_plan_example": "उदाहरणार्थ: '१ एकर शेतात टोमॅटो लावण्याची चांगली योजना कोणती आहे?'",
