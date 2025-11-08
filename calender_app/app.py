@@ -255,46 +255,50 @@ if calendar_output and calendar_output.get("callback") == "eventClick":
     selected_event = next((event for event in st.session_state.events if event["id"] == event_id), None)
 
     if selected_event:
-        # If the event title has a pencil icon, it means it's a plan that can be edited.
-        if "📝" in selected_event.get("title", ""):
-            st.session_state.editing_event_id = event_id
-        else:
-            # For other events, you might want to open a simple modal or do something else.
-            # For now, we'll just open the modal with the event details.
-            st.session_state.selected_event = selected_event
-            modal.open()
-
-if 'editing_event_id' in st.session_state and st.session_state.editing_event_id:
-    event_to_edit = next((event for event in st.session_state.events if event["id"] == st.session_state.editing_event_id), None)
-    if event_to_edit:
-        st.subheader("Edit Plan")
-        new_heading = st.text_input("Heading", value=event_to_edit["extendedProps"]["heading"])
-        
-        for i, step in enumerate(event_to_edit["extendedProps"]["plan"]):
-            st.write(f"**Step {step['step_number']}: {step['title']}**")
-            event_to_edit["extendedProps"]["plan"][i]['description'] = st.text_area("", step['description'], height=100, key=f"edit_step_{i}")
-
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            if st.button("Save Changes"):
-                event_to_edit["extendedProps"]["heading"] = new_heading
-                event_to_edit["title"] = f"{new_heading} 📝"
-                st.session_state.editing_event_id = None
-                st.experimental_rerun()
-        with col2:
-            if st.button("Cancel"):
-                st.session_state.editing_event_id = None
-                st.experimental_rerun()
-        with col3:
-            if st.button("Delete"):
-                st.session_state.events = [event for event in st.session_state.events if event["id"] != st.session_state.editing_event_id]
-                st.session_state.editing_event_id = None
-                st.experimental_rerun()
+        st.session_state.selected_event = selected_event
+        modal.open()
 
 if modal.is_open():
     with modal.container():
         if 'selected_event' in st.session_state:
-            st.subheader(st.session_state.selected_event["extendedProps"]["heading"])
-            for step in st.session_state.selected_event["extendedProps"]["plan"]:
-                st.write(f"**Step {step['step_number']}: {step['title']}**")
-                st.write(step['description'])
+            event = st.session_state.selected_event
+            st.subheader(event["extendedProps"]["heading"])
+            
+            # Display event time
+            st.write(f"**Time:** {event['start'].split('T')[1]} - {event['end'].split('T')[1]}")
+
+            if 'editing' not in st.session_state:
+                st.session_state.editing = False
+
+            if st.session_state.editing:
+                new_heading = st.text_input("Heading", value=event["extendedProps"]["heading"])
+                
+                for i, step in enumerate(event["extendedProps"]["plan"]):
+                    st.write(f"**Step {step['step_number']}: {step['title']}**")
+                    event["extendedProps"]["plan"][i]['description'] = st.text_area("", step['description'], height=100, key=f"edit_step_{i}")
+
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    if st.button("Save Changes"):
+                        event["extendedProps"]["heading"] = new_heading
+                        event["title"] = f"{new_heading} 📝"
+                        st.session_state.editing = False
+                        st.experimental_rerun()
+                with col2:
+                    if st.button("Cancel"):
+                        st.session_state.editing = False
+                        st.experimental_rerun()
+                with col3:
+                    if st.button("Delete"):
+                        st.session_state.events = [e for e in st.session_state.events if e["id"] != event["id"]]
+                        st.session_state.editing = False
+                        modal.close()
+                        st.experimental_rerun()
+            else:
+                for step in event["extendedProps"]["plan"]:
+                    st.write(f"**Step {step['step_number']}: {step['title']}**")
+                    st.write(step['description'])
+                
+                if st.button("Edit"):
+                    st.session_state.editing = True
+                    st.experimental_rerun()
