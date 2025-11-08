@@ -144,7 +144,7 @@ if 'lang' not in st.session_state:
 
 st.sidebar.title(translations[st.session_state.lang]["language_select"])
 lang_options = {"English": "en", "हिन्दी": "hi", "मराठी": "mr"}
-selected_lang_display = st.sidebar.selectbox("", list(lang_options.keys()))
+selected_lang_display = st.sidebar.selectbox(translations[st.session_state.lang]["language_select"], list(lang_options.keys()))
 st.session_state.lang = lang_options[selected_lang_display]
 
 st.title(translations[st.session_state.lang]["title"])
