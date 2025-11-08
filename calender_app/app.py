@@ -68,6 +68,24 @@ translations = {
         "calendar_header": "तुमची शेती दिनदर्शिका",
         "event_plan_header": "कार्यक्रमाची योजना",
         "language_select": "भाषा"
+    },
+    "fr": {
+        "title": "Assistant de calendrier Gemini pour les agriculteurs",
+        "get_plan_header": "Obtenir un plan agricole",
+        "get_plan_write": "Demandez un plan agricole, et Gemini vous aidera.",
+        "get_plan_example": "Par exemple : 'Quel est un bon plan pour planter des tomates dans un champ d'un acre ?'",
+        "enter_question": "Entrez votre question agricole :",
+        "get_plan_button": "Obtenir le plan",
+        "generated_plan_header": "Plan généré",
+        "heading_label": "Titre :",
+        "plan_label": "Plan :",
+        "select_date": "Sélectionnez une date pour l'événement",
+        "select_start_time": "Sélectionnez une heure de début pour l'événement",
+        "select_end_time": "Sélectionnez une heure de fin pour l'événement",
+        "add_event_button": "Ajouter l'événement au calendrier",
+        "calendar_header": "Votre calendrier agricole",
+        "event_plan_header": "Plan d'événement",
+        "language_select": "Langue"
     }
 }
 
@@ -132,6 +150,26 @@ prompt_examples = {
                 "description": "रोपांना नियमित पाणी द्या, माती ओलसर ठेवा पण पाणी साचू देऊ नका."
             }
         ]
+    },
+    "fr": {
+        "heading": "Plan de plantation de tomates",
+        "plan": [
+            {
+                "step_number": 1,
+                "title": "Préparation du sol",
+                "description": "Préparez le sol en ajoutant du compost et en labourant jusqu'à une profondeur de 6 pouces."
+            },
+            {
+                "step_number": 2,
+                "title": "Plantation des semis",
+                "description": "Plantez les plants de tomates à 2 pieds de distance en rangées, en veillant à ce que la motte soit recouverte."
+            },
+            {
+                "step_number": 3,
+                "title": "Arrosage",
+                "description": "Arrosez régulièrement les plants, en gardant le sol humide mais pas détrempé."
+            }
+        ]
     }
 }
 
@@ -143,7 +181,7 @@ if 'lang' not in st.session_state:
     st.session_state.lang = "en"
 
 st.sidebar.title(translations[st.session_state.lang]["language_select"])
-lang_options = {"English": "en", "हिन्दी": "hi", "मराठी": "mr"}
+lang_options = {"English": "en", "हिन्दी": "hi", "मराठी": "mr", "Français": "fr"}
 selected_lang_display = st.sidebar.selectbox("", list(lang_options.keys()))
 st.session_state.lang = lang_options[selected_lang_display]
 
