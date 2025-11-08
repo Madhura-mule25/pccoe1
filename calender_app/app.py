@@ -264,6 +264,12 @@ if modal.is_open():
             event = st.session_state.selected_event
             st.subheader(event["extendedProps"]["heading"])
             
+            # Debugging statements
+            st.write("--- Debugging Info ---")
+            st.write("Selected Event:", event)
+            st.write("Event Extended Props:", event.get("extendedProps"))
+            st.write("--- End Debugging Info ---")
+            
             # Display event time
             st.write(f"**Time:** {event['start'].split('T')[1]} - {event['end'].split('T')[1]}")
 
