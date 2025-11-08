@@ -71,6 +71,70 @@ translations = {
     }
 }
 
+
+prompt_examples = {
+    "en": {
+        "heading": "Tomato Planting Plan",
+        "plan": [
+            {
+                "step_number": 1,
+                "title": "Soil Preparation",
+                "description": "Prepare the soil by adding compost and tilling to a depth of 6 inches."
+            },
+            {
+                "step_number": 2,
+                "title": "Planting Seedlings",
+                "description": "Plant the tomato seedlings 2 feet apart in rows, ensuring the root ball is covered."
+            },
+            {
+                "step_number": 3,
+                "title": "Watering",
+                "description": "Water the seedlings regularly, keeping the soil moist but not waterlogged."
+            }
+        ]
+    },
+    "hi": {
+        "heading": "टमाटर लगाने की योजना",
+        "plan": [
+            {
+                "step_number": 1,
+                "title": "मिट्टी की तैयारी",
+                "description": "6 इंच की गहराई तक खाद और जुताई करके मिट्टी तैयार करें।"
+            },
+            {
+                "step_number": 2,
+                "title": "पौधे लगाना",
+                "description": "टमाटर के पौधों को पंक्तियों में 2 फीट की दूरी पर लगाएं, यह सुनिश्चित करते हुए कि जड़ की गेंद ढकी हुई है।"
+            },
+            {
+                "step_number": 3,
+                "title": "पानी देना",
+                "description": "पौधों को नियमित रूप से पानी दें, मिट्टी को नम रखें लेकिन जलभराव न हो।"
+            }
+        ]
+    },
+    "mr": {
+        "heading": "टोमॅटो लागवड योजना",
+        "plan": [
+            {
+                "step_number": 1,
+                "title": "मातीची तयारी",
+                "description": "कंपोस्ट टाकून आणि ६ इंच खोलीपर्यंत नांगरणी करून माती तयार करा."
+            },
+            {
+                "step_number": 2,
+                "title": "रोपे लावणे",
+                "description": "टोमॅटोची रोपे ओळींमध्ये २ फूट अंतरावर लावा, मुळांचा गोळा झाकला जाईल याची खात्री करा."
+            },
+            {
+                "step_number": 3,
+                "title": "पाणी देणे",
+                "description": "रोपांना नियमित पाणी द्या, माती ओलसर ठेवा पण पाणी साचू देऊ नका."
+            }
+        ]
+    }
+}
+
 # --- Streamlit App ---
 st.set_page_config(layout="wide")
 
@@ -111,26 +175,7 @@ if 'prompt' in st.session_state and st.session_state.prompt:
     The 'plan' should be a list of steps, where each step is an object with the following keys: 'step_number', 'title', and 'description'.
 
     Example output format:
-    {{
-        "heading": "Tomato Planting Plan",
-        "plan": [
-            {{
-                "step_number": 1,
-                "title": "Soil Preparation",
-                "description": "Prepare the soil by adding compost and tilling to a depth of 6 inches."
-            }},
-            {{
-                "step_number": 2,
-                "title": "Planting Seedlings",
-                "description": "Plant the tomato seedlings 2 feet apart in rows, ensuring the root ball is covered."
-            }},
-            {{
-                "step_number": 3,
-                "title": "Watering",
-                "description": "Water the seedlings regularly, keeping the soil moist but not waterlogged."
-            }}
-        ]
-    }}
+    {json.dumps(prompt_examples[st.session_state.lang], indent=4, ensure_ascii=False)}
 
     Task: {st.session_state.prompt}
     """
@@ -162,11 +207,6 @@ if 'plan_data' in st.session_state:
         st.write(f"**Step {step['step_number']}: {step['title']}**")
         st.session_state.plan_data['plan'][i]['description'] = st.text_area("", step['description'], height=100, key=f"step_{i}")
 
-    # Combine the plan into a single string for the calendar event
-    edited_plan = ""
-    for step in st.session_state.plan_data['plan']:
-        edited_plan += f"Step {step['step_number']}: {step['title']}\n{step['description']}\n\n"
-
     event_date = st.date_input(translations[st.session_state.lang]["select_date"])
     start_time = st.time_input(translations[st.session_state.lang]["select_start_time"])
     end_time = st.time_input(translations[st.session_state.lang]["select_end_time"])
@@ -174,12 +214,15 @@ if 'plan_data' in st.session_state:
     if st.button(translations[st.session_state.lang]["add_event_button"]):
         event_start = f"{event_date}T{start_time}"
         event_end = f"{event_date}T{end_time}"
+        event_id = str(len(st.session_state.events))
         event = {
-            "title": edited_heading,
+            "id": event_id,
+            "title": f"{edited_heading} 📝",
             "start": event_start,
             "end": event_end,
             "extendedProps": {
-                "plan": edited_plan
+                "plan": st.session_state.plan_data['plan'],
+                "heading": edited_heading
             }
         }
         st.session_state.events.append(event)
@@ -205,10 +248,53 @@ calendar_options = {
 calendar_output = calendar(events=st.session_state.events, options=calendar_options, callbacks=["eventClick"])
 
 if calendar_output and calendar_output.get("callback") == "eventClick":
-    st.session_state.selected_event = calendar_output.get("event", {}).get("extendedProps", {}).get("plan", "")
-    modal.open()
+    event_data = calendar_output.get("event", {})
+    event_id = event_data.get("id")
+    
+    # Find the selected event from the session state
+    selected_event = next((event for event in st.session_state.events if event["id"] == event_id), None)
+
+    if selected_event:
+        # If the event title has a pencil icon, it means it's a plan that can be edited.
+        if "📝" in selected_event.get("title", ""):
+            st.session_state.editing_event_id = event_id
+        else:
+            # For other events, you might want to open a simple modal or do something else.
+            # For now, we'll just open the modal with the event details.
+            st.session_state.selected_event = selected_event
+            modal.open()
+
+if 'editing_event_id' in st.session_state and st.session_state.editing_event_id:
+    event_to_edit = next((event for event in st.session_state.events if event["id"] == st.session_state.editing_event_id), None)
+    if event_to_edit:
+        st.subheader("Edit Plan")
+        new_heading = st.text_input("Heading", value=event_to_edit["extendedProps"]["heading"])
+        
+        for i, step in enumerate(event_to_edit["extendedProps"]["plan"]):
+            st.write(f"**Step {step['step_number']}: {step['title']}**")
+            event_to_edit["extendedProps"]["plan"][i]['description'] = st.text_area("", step['description'], height=100, key=f"edit_step_{i}")
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("Save Changes"):
+                event_to_edit["extendedProps"]["heading"] = new_heading
+                event_to_edit["title"] = f"{new_heading} 📝"
+                st.session_state.editing_event_id = None
+                st.experimental_rerun()
+        with col2:
+            if st.button("Cancel"):
+                st.session_state.editing_event_id = None
+                st.experimental_rerun()
+        with col3:
+            if st.button("Delete"):
+                st.session_state.events = [event for event in st.session_state.events if event["id"] != st.session_state.editing_event_id]
+                st.session_state.editing_event_id = None
+                st.experimental_rerun()
 
 if modal.is_open():
     with modal.container():
-        st.subheader(translations[st.session_state.lang]["event_plan_header"])
-        st.write(st.session_state.get("selected_event", ""))
+        if 'selected_event' in st.session_state:
+            st.subheader(st.session_state.selected_event["extendedProps"]["heading"])
+            for step in st.session_state.selected_event["extendedProps"]["plan"]:
+                st.write(f"**Step {step['step_number']}: {step['title']}**")
+                st.write(step['description'])
